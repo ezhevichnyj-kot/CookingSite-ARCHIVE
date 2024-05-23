@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cook's stash</title>
+    <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
+    <link rel = "stylesheet" th:href="@{/styles/StyleLogin.css}">
+    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
+    <meta http-equiv="Content-Type">
+</head>
+
+<body>
+    <div th:insert="fragments/header :: header"></div>
+    
+    <label><h1 align="center"><em>Авторизация</em></h1></label>
+    
+    <div class="upperTable">
+        <form th:action="@{/perform-login}" method="post" class="table_part" style="background: #DE9E7B; border: none; border-radius: 7px; padding: 10px;">
+            <input name="username" class="small_part" style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" type="text" placeholder="Логин">
+            <input name="password" class="small_part" style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" type="password" placeholder="Пароль">
+            <button type="submit" class="small_part form_button" style="width: 92%;">Войти</button>
+            <p th:if="${error}">
+            </form>
+        </div>
+        
+        <label><h4 class="text_reg" align="center"><em><a href="/user/register" style="font-size: 20px; text-decoration: underline;">Регистрация</a></em></h4></label>
+    </body>
+    </html>

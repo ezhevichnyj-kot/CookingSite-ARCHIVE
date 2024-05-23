@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cook's stash</title>
+    <link rel="icon" th:href="@{images/prof_photo.jpg}" type="images/x-icon">
+    <link rel = "stylesheet" th:href="@{styles/StyleProfil.css}">
+    <meta http-equiv="Content-Type">
+</head>
+
+<header class="header">
+    <div class="header_section">
+        <a href="/main" class="headerButton"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item headerButton" href="/main">На главную</a>
+        <a class="header_item headerButton" href="/search">Расширенный поиск</a>
+    </div>
+    <a href="/logout" class="header_section">
+        <div class="header_item headerButton">Выйти из профиля</div>
+    </a>
+</header>
+
+<body class="" style="background: url(images/backgroundLight.jpg); height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+
+    <h1 align="center"><label>Мой профиль</label></h1>
+
+    <div class="profile_table">
+        <div class="profile_part">
+            <img th:if="${user.getPhoto_path() == null}" class="small_part profile_image" src="../images/prof_photo.jpg" style="width: 230px; height: 230px; top: 0px;">
+            <img th:if="${user.getPhoto_path() != null}" class="small_part profile_image" th:src="${'/photos/' + user.getId() + '.jpg'}" style="width: 230px; height: 230px; top: 0px;">
+
+            <form class="small_part" action="/profile" method="POST" enctype="multipart/form-data">
+                <label class="form_button" style="display: block; margin: 10px; margin-left: 10px; text-align: center; height: 24px;">
+                    <input style="display: none; width: 100%; height: 100%;" type="file" name="load_photo">
+                    Выбрать фото
+                </label>
+                <button type="submit" class="form_button" style="height: 50px; display: block;">Поменять фото</button>
+            </form>
+        </div>
+
+        <div class="profile_part">
+            <div class="form" style="text-align: left;">
+                <p style="font-weight: bold; color: #13452d">Логин (нельзя изменять)</p>
+                <p class="form_input" th:text="${user.getUsername()}"></p>
+
+                <p style="font-weight: bold; color: #13452d">Смена пароля</p>
+                <input type="password" class="form_input" placeholder="Новый пароль" id="new_password_put">
+
+                <p style="display: inline; font-weight: bold; color: #13452d">Подтверджение</p>
+                <p style="display: inline; color: #13452d; font-size:24px;">*</p>
+                <input type="password" class="form_input" placeholder="Старый пароль" id="old_password_put">
+
+                <button class="form_button" onclick="enterUserData();">Сохранить</button>
+                <p style="display: none; font-weight: bold; color: #13452d; width: 90%;" id="password_changed">Пароль изменён! Осуществляется выход из аккаунта<p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 60px; width: 100%; text-align: center;">
+        <h1 style="font-size: 26px;">Мои рецепты</h1>
+    </div>
+
+    <button class="create_button" onclick="redirectToCreate();">Создать рецепт +</button>
+
+    <div class="recipe_table" id="recipe_table">
+        <div class="recipe_line" style="display: none;" id="recipe_line_copy">
+            <div class="recipe_place" id="recipe_place_copy">
+                <a>
+                    <p style="margin: 5px;" class="recipe_name"></p>
+                    <img class="recipe_image" style="width: 315px; height: 315px; margin: 5px;">
+                </a>
+                <div style="width: 100%; text-align: center; margin: 3px;">
+                    <button class="recipe_button_delete change_text" onclick="redirect(this.id);">Редактировать</button>
+                    <button class="recipe_button_delete btn_del" onclick="deleteCurrent(this.id);">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- redirects-->
+    <script>
+        function redirectToCreate() {
+            window.location.href = "http://localhost:8080/create_recipe";
+        }
+
+        function redirect(btn_id) {
+            var new_str = btn_id.slice(8);
+            window.location.href = "http://localhost:8080/create_recipe/" + new_str;
+        }
+    </script>
+
+    <!-- enterUserData-->
+    <script>
+        function enterUserData() {
+
+            var xmlHttp = new XMLHttpRequest();
+            oldform = document.getElementById("old_password_put");
+            newform = document.getElementById("new_password_put");
+            param = "?check=" + oldform.value;
+            if (newform.value != "")
+                param += "&newp=" + newform.value;
+
+            console.log(param);
+
+            if (param != "")
+            {
+                xmlHttp.open( "GET", "http://localhost:8080/admit_password"+ param, false ); // false for synchronous request
+                xmlHttp.send();
+
+                console.log(xmlHttp.response);
+
+                if (xmlHttp.response == "true")
+                {
+                    document.getElementById("password_changed").style.display = 'block';
+                    setTimeout(()=>{window.location.href = "http://localhost:8080/logout";}, 4000);
+                }
+                else
+                {
+                    oldform.style ="border-color: rgb(180, 0, 0); background: #f0a3a3;";
+                    console.log("Введён неверный пароль!");
+                    setTimeout(()=>{oldform.style ="background: #F9F0DA; border-color: transparent;";}, 4000);
+                    oldform.value = "";
+                }
+            }
+            else
+            {
+                oldform.style = "border-color: rgb(180, 0, 0); background: #f0a3a3;";
+                console.log("Старый пароль не был введён");
+                setTimeout(()=>{oldform.style ="background: #F9F0DA; border-color: transparent;";}, 4000);
+                oldform.value = "";
+            }
+        }
+    </script>
+
+    <!-- on_load & upload-->
+    <script>
+
+    var line_index = document.getElementById("recipe_line_copy").cloneNode(false);
+
+    inline_recipe_index = 0;
+
+    window.onload = () => {
+    document.getElementById("recipe_table").appendChild(line_index);
+    line_index.style = "";
+    uploadCreateRecipes();
+    }
+
+    function uploadCreateRecipes() {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", "http://localhost:8080/profile/get_created_recipes", false ); // false for synchronous request
+        xmlHttp.send();
+
+        line_index = document.getElementById("recipe_line_copy").cloneNode(false);
+        inline_recipe_index = 3;
+
+        var myArr = JSON.parse(xmlHttp.response);
+        if (myArr == null || myArr.length == 0) {
+            console.log("myArr is null");
+        }
+        else
+        {
+            console.log("myArr = ",myArr);
+
+            myArr.forEach(function(entry) {
+                if (inline_recipe_index == 3) {
+                    line_index = document.getElementById("recipe_line_copy").cloneNode(false);
+                    document.getElementById("recipe_table").appendChild(line_index);
+                    line_index.id = "";
+                    line_index.style = "";
+                    inline_recipe_index = 0;
+
+                    temporary_recipe = document.getElementById("recipe_place_copy").cloneNode(true);
+                    temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
+
+                    child_p = temporary_recipe.querySelector('.recipe_name');
+                    child_img = temporary_recipe.querySelector('.recipe_image');
+
+                    btn_del = temporary_recipe.querySelector('.btn_del');
+                    redirect_text = temporary_recipe.querySelector('.change_text');
+
+                    redirect_text.id = "redirect" + entry.id;
+                    btn_del.id = "button" + entry.id;
+
+                    child_p.innerHTML = entry.name;
+                    if (entry.image_path == null)
+                        child_img.src = "../images/ReseptLogo.jpg";
+                    else
+                        child_img.src = "/img/" + entry.id + ".jpg";
+
+                    line_index.appendChild(temporary_recipe);
+                    inline_recipe_index += 1;
+                }
+                else
+                {
+                    temporary_recipe = document.getElementById("recipe_place_copy").cloneNode(true);
+                    temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
+
+                    child_p = temporary_recipe.querySelector('.recipe_name');
+                    child_img = temporary_recipe.querySelector('.recipe_image');
+
+                    btn_del = temporary_recipe.querySelector('.btn_del');
+                    redirect_text = temporary_recipe.querySelector('.change_text');
+
+                    redirect_text.id = "redirect" + entry.id;
+                    btn_del.id = "button" + entry.id;
+
+                    child_p.innerHTML = entry.name;
+                    if (entry.image_path == null)
+                        child_img.src = "../images/ReseptLogo.jpg";
+                    else
+                        child_img.src = "/img/" + entry.id + ".jpg";
+
+                    line_index.appendChild(temporary_recipe);
+                    inline_recipe_index += 1;
+                }
+            });
+        }
+    }
+</script>
+
+    <!-- delete_current-->
+    <script>
+    function deleteCurrent(an_id) {
+        var change_btn = document.getElementById(an_id);
+        if (change_btn.name != "del"+an_id)
+        {
+            change_btn.innerHTML = "Вы уверены?";
+            change_btn.style = "background: #a80000;";
+            change_btn.name = "del"+an_id;
+        }
+        else
+        {
+            console.log("DELETE PATH");
+            var xmlHttp = new XMLHttpRequest();
+            var params = an_id.slice(6);
+            console.log(params);
+            xmlHttp.open( "GET", "http://localhost:8080/delete_recipe?id=" + params, false ); // false for synchronous request
+            xmlHttp.send();
+
+            console.log(xmlHttp.response);
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>

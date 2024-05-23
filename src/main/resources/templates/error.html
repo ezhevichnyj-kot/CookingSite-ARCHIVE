@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cook's stash</title>
+    <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
+    <link rel = "stylesheet" th:href="@{/styles/StyleMain.css}">
+    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
+    <meta http-equiv="Content-Type">
+</head>
+
+<body>
+    <div th:insert="fragments/header :: header"></div>
+    <p th:if="${error_code != null}" th:text="${'Ошибка ' + error_code}" style="font-size: 42px; margin-top: 40%; color:#F9F0DA" align="center"></p>
+    <p th:if="${error_code == null}" style="font-size: 30px; margin-top: 50px; color:#F9F0DA" align="center">Ошибка 404</p>
+</body>
+</html>

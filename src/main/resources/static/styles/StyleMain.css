@@ -1,0 +1,89 @@
+*
+{
+    margin: 0%;
+}
+a
+{
+    color:#AB5421;
+    text-decoration: none;
+}
+
+h1
+{
+    color: #F9F0DA;
+    margin-top: 0%;
+    font-size: 3em;
+}
+ul{
+    margin-top: 4%;
+    margin-bottom: 4%;
+    display: flex;
+    color: #F9F0DA;
+}
+li
+{
+    margin-left: 3%;
+    margin-right: 3%;
+}
+
+.recipe_table
+{
+    text-align: center;
+}
+.recipe_table_line
+{
+    display: block;
+}
+.recipe_place
+{
+    text-align: left;
+    display: inline-block;
+    margin: 10px;
+    background-color: #F9F0DA;
+    border-radius: 5px;
+}
+.recipe_place:hover
+{
+    background: #63CCB2;
+    color: #F9F0DA;
+}
+.central_search
+{
+    display: inline-flex;
+    justify-content: center;
+    white-space:nowrap;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+}
+.input_inside {
+    padding-left: 10px;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    width: 50%;
+    height: 40px;
+    font-size: 24px;
+    background: #F9F0DA;
+}
+.button_inside {
+    position: relative;
+    background: #F9F0DA;
+    margin-left:5px;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    height: 44px;
+    width: 44px;
+    cursor: pointer;
+}
+.button_inside:hover
+{
+    background: #166F59;
+    border: 5px;
+}
+.recept_item
+{
+    padding: 5px;
+    font-size: 18px;
+}

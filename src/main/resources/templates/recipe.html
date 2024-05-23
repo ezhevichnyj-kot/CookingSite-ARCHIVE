@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cook's stash</title>
+    <link rel="icon" th:href="@{../images/prof_photo.jpg}" type="images/x-icon">
+    <link rel = "stylesheet" th:href="@{../styles/StyleRecept.css}">
+    <meta http-equiv="Content-Type">
+</head>
+
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/main">На главную</a>
+        <a class="header_item" href="/search">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/user/login" class="header_item">Вход/Регистрация</a>
+    </div>
+</header>
+
+<body class="" style="background: url(../images/backgroundLight.jpg); height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+    <div class="containerForId" style="display: none;" th:id="${showRecipe.getId()}"></div>
+
+    <div class="upperTable">
+        <div class="table_part">
+            <img th:if="${showRecipe.getImage_path() != null && showRecipe.getName() != ''}" class="recipe_image" th:src="${'/img/' + showRecipe.getId() + '.jpg'}" style="width: 230px; height: 230px;">
+            <img th:if="${showRecipe.getImage_path() == null || showRecipe.getName() == ''}" class="recipe_image" src="../images/ReseptLogo.jpg" style="width: 230px;">
+        </div>
+        <div class="table_part">
+            <div class="small_part">
+                <p th:if="${showRecipe.getName() != null && showRecipe.getName() != ''}" style="font-weight: bold; font-size: 22px;" th:text="${showRecipe.getName()}"></p>
+                <p th:if="${showRecipe.getName() == null || showRecipe.getName() == ''}" style="font-weight: bold; font-size: 22px;">Без названия</p>
+            </div>
+            <div class="small_part">
+                <p style="display: inline-block; margin-right: 3px;">Категория:</p>
+                <p th:if="${showRecipe.getCategory() != null && showRecipe.getCategory() != ''}" style="display: inline-block; margin-right: 3px;" th:text="${showRecipe.getCategory()}"></p>
+                <p th:if="${showRecipe.getCategory() == null || showRecipe.getCategory() == ''}" style="display: inline-block; margin-right: 3px;">без категории</p>
+            </div>
+            <div class="small_part">
+                <p style="display: inline-block; margin-right: 3px;">Время приготовления:</p>
+                <p th:if="${showRecipe.getCook_time() != null && showRecipe.getCook_time() != ''}" style="display: inline-block; margin-right: 3px;" th:text="${showRecipe.getCook_time()}"></p>
+                <p th:if="${showRecipe.getCook_time() == null || showRecipe.getCook_time() == ''}" style="display: inline-block; margin-right: 3px;">неопределено</p>
+            </div>
+
+            <p class="small_part">Ингредиенты:</p>
+            <div class="small_part" style="display: flex; max-width: 300px; flex-direction:row; flex-wrap:wrap;" id="ingredient_table">
+                <p style="display: none;" class="ingredient_show" id="ingredient_copy"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="upperTable">
+        <label><h2 style="color: #13452d;">Описание</h2></label>
+        <p th:if="${showRecipe.getDescription() != null && showRecipe.getDescription() != ''}" style="width: 50%; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getDescription()}"></p>
+        <p th:if="${showRecipe.getDescription() == null || showRecipe.getDescription() == ''}" style="width: 50%; font-size: 18px; display: inline-block; text-align: left;">Описание отсутствует.</p>
+    </div>
+
+    <div class="upperTable">
+        <label><h2 style="color: #13452d;">Процесс приготовления</h2></label>
+        <p th:if="${showRecipe.getCook_steps() != null && showRecipe.getCook_steps() != ''}" style="width: 50%; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getCook_steps()}"></p>
+        <p th:if="${showRecipe.getCook_steps() == null || showRecipe.getCook_steps() == ''}" style="width: 50%; font-size: 18px; display: inline-block; text-align: left;">Нет описания процесса приготовления данного блюда. Приносим свои извинения!</p>
+    </div>
+</div>
+
+
+<script>
+    window.onload = () => {
+        var xmlHttp = new XMLHttpRequest();
+        var containerId = document.querySelector('.containerForId');
+        xmlHttpParams = "?id="+ containerId.id;
+        xmlHttp.open( "GET", "http://localhost:8080/get_ingredients" + xmlHttpParams, false ); // false for synchronous request
+        xmlHttp.send();
+
+        var table = document.getElementById("ingredient_table");
+        var ingArr = JSON.parse(xmlHttp.response);
+        if (ingArr == null || ingArr.length == 0) {
+            console.log("ingredients array is null");
+            var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
+            new_ingredient.style = "";
+            new_ingredient.innerHTML = "отсутствуют";
+            table.appendChild(new_ingredient);
+        }
+        else
+        {
+            console.log("ingArr = ",ingArr);
+            ingArr.forEach(function(entry){
+                var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
+                new_ingredient.style = "";
+                new_ingredient.innerHTML = entry;
+                table.appendChild(new_ingredient);
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

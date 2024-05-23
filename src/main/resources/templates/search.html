@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cook's stash</title>
+    <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
+    <link rel = "stylesheet" th:href="@{../styles/StyleRecept.css}">
+    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
+    <meta http-equiv="Content-Type">
+</head>
+
+<body>
+    <div th:insert="fragments/header :: header"></div>
+    <label><h1 align="center" style="margin:10px;"><em>Поиск рецептов</em></h1></label>
+
+    <div class="upperTable" id="search_block">
+        <div style="background: #E9B192; border: none; border-radius: 7px; display: inline-block;">
+            <div style="display: block;">
+                <div class="table_part" style="padding: 10px;">
+                    <input style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" class="small_part" type="text" placeholder="Название" id="get_name">
+                    <input style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" class="small_part" type="text" placeholder="Категория" id="get_category">
+                    <input style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" class="small_part" type="time" placeholder="Категория" id="get_time">
+                </div>
+
+                <div class="table_part" style="border-radius: 7px; border: none; padding: 10px; text-align: left;">
+                    <input align="left" style="font-size: 22px; background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" maxlength="30" id="ingredient_tab" placeholder="Название ингредиента" list="ingredients">
+                    <button class="small_part form_button" style="height: 50px;" onclick="add_ingredient()">Добавить ингредиент</button>
+                </div>
+            </div>
+            <div style="display: block; align: center;" align="middle">
+                <div align="center" class="small_part" style="display: flex; max-width: 80%; flex-direction:row; flex-wrap:wrap;" id="ingredient_table">
+                    <button style="display: none; background: #F9F0DA; color: #13452d; padding: 3px;" class="ingredient_show" id="ingredient_copy"></button>
+                </div>
+                <datalist id="ingredients">
+                    <option id="option">
+                </datalist>
+            </div>
+        </div>
+    </div>
+
+    <div class="upperTable">
+        <button class="form_button" onclick="findRecipes();">Найти</button>
+        <button class="form_button" onclick="window.location.reload();">Сбросить</button>
+    </div>
+
+    <div class="recipe_table" id="id_recipe_table_copy">
+        <div class="recipe_table_line" id="id_recipe_table_line_copy" style="display: none">
+            <a class="recipe_place" id="id_recipe_copy">
+                <div class="recept_item pchild"></div>
+                <div class="image_place">
+                    <img width="315" height="315" style="margin: 5px" class="imgchild">
+                </div>
+                <div class="recept_item catchild"></div>
+                <div class="recept_item timechild"></div>
+            </a>
+        </div>
+    </div>
+
+
+    <!--Add by click-->
+    <script>
+        INGREDIENT_COUNT = 0;
+
+        function add_ingredient() {
+            if (document.getElementById("ingredient_tab").value != null && document.getElementById("ingredient_tab").value != "" && INGREDIENT_COUNT != 15)
+            {
+                var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
+                new_ingredient.id = '';
+                new_ingredient.style.display = '';
+                new_ingredient.innerHTML = document.getElementById("ingredient_tab").value;
+                var table = document.getElementById("ingredient_table");
+                table.appendChild(new_ingredient);
+
+                document.getElementById("ingredient_tab").value = '';
+                INGREDIENT_COUNT += 1;
+            }
+        }
+    </script>
+    <!--Add on load-->
+    <script>
+        window.onload = () => {
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", "http://localhost:8080/get_all_ingredients", false ); // false for synchronous request
+        xmlHttp.send();
+
+        var allingArr = JSON.parse(xmlHttp.response);
+        if (allingArr == null || allingArr.length == 0) {
+            console.log("all ingredients array is null");
+        }
+        else
+        {
+            console.log("allingArr = ",allingArr);
+            allingArr.forEach(function(entry){
+                var new_ingredient = document.getElementById("option").cloneNode(true);
+                new_ingredient.value = entry.name;
+                document.getElementById("ingredients").appendChild(new_ingredient);
+            });
+        }
+    }
+    </script>
+    <!--Find Recipes-->
+    <script>
+        function findRecipes() {
+
+            clearTable();
+
+            xmlHttp = new XMLHttpRequest();
+
+            var xmlParams = "";
+
+            var ingreds_table = document.getElementById("ingredient_table");
+            var name_field = document.getElementById("get_name");
+            var category_field = document.getElementById("get_category");
+            var time_field = document.getElementById("get_time");
+
+            console.log(time_field.value);
+
+            var children = ingreds_table.children;
+            for (var i = 0; i < children.length; i++) {
+                var child = children[i];
+                xmlParams += "&ingredients_arr=" + child.textContent || child.innerText;
+            }
+            if(name_field.value != null && name_field.value != '')
+                xmlParams += "&find_name=" + name_field.value;
+            if(category_field.value != null && category_field.value != '')
+                xmlParams += "&category=" + category_field.value;
+            if(time_field.value != null && time_field.value != '')
+                xmlParams += "&time=" + time_field.value;
+
+            xmlHttp.open( "GET", "http://localhost:8080/search_recipes?count=12" + xmlParams, false ); // false for synchronous request
+            xmlHttp.send();
+
+            var inline_recipe_index = 3;
+            var line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
+
+            var myArr = JSON.parse(xmlHttp.response);
+            if (myArr == null || myArr.length == 0) {
+                RECIPESEND = true;
+                console.log("myArr is null");
+            }
+            else
+            {
+                console.log("myArr = ",myArr);
+
+                myArr.forEach(function(entry) {
+                    if (inline_recipe_index == 3) {
+                        line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
+                        line_index.id = "";
+                        line_index.style = "";
+                        inline_recipe_index = 0;
+
+                        temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
+                        temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
+
+                        child_p = temporary_recipe.querySelector('.pchild');
+                        child_img = temporary_recipe.querySelector('.imgchild');
+                        child_cat = temporary_recipe.querySelector('.catchild');
+                        child_time = temporary_recipe.querySelector('.timechild');
+
+                        if (entry.cook_time == null)
+                            child_time.innerHTML = "Без времени";
+                        else
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
+                        if (entry.category == null)
+                            child_cat.innerHTML = "Без категории";
+                        else
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
+                        child_p.innerHTML = entry.name;
+                        if (entry.image_path == null)
+                            child_img.src = "../images/ReseptLogo.jpg";
+                        else
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
+                        line_index.appendChild(temporary_recipe);
+                        inline_recipe_index += 1;
+                        last_id = entry.id;
+                    }
+                    else
+                    {
+                        temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
+                        temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
+
+                        child_p = temporary_recipe.querySelector('.pchild');
+                        child_img = temporary_recipe.querySelector('.imgchild');
+                        child_cat = temporary_recipe.querySelector('.catchild');
+                        child_time = temporary_recipe.querySelector('.timechild');
+
+                        if (entry.cook_time == null)
+                            child_time.innerHTML = "Без времени";
+                        else
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
+                        if (entry.category == null)
+                            child_cat.innerHTML = "Без категории";
+                        else
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
+                        child_p.innerHTML = entry.name;
+                        if (entry.image_path == null)
+                            child_img.src = "../images/ReseptLogo.jpg";
+                        else
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
+                        line_index.appendChild(temporary_recipe);
+                        inline_recipe_index += 1;
+                        last_id = entry.id;
+
+                        if (inline_recipe_index == 3)
+                            document.getElementById("id_recipe_table_copy").appendChild(line_index);
+                    }
+                });
+            }
+        }
+    </script>
+    <script>
+        function clearTable() {
+            table = document.getElementById("id_recipe_table_copy");
+            delete_child = table.lastElementChild;
+            while (delete_child.id != "id_recipe_table_line_copy") {
+                console.log(delete_child.id);
+                table.removeChild(delete_child);
+                delete_child = table.lastElementChild;
+            }
+        }
+    </script>
+</body>
+</html>

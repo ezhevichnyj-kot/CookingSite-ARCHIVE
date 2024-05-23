@@ -1,0 +1,11 @@
+<div th:fragment="header" class="header">
+    <div class="header_section">
+        <a href="/"><img src="../../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/">На главную</a>
+        <a class="header_item" href="/search/">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/user/" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/user/login" class="header_item">Вход/Регистрация</a>
+    </div>
+</div>
