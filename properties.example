@@ -1,3 +1,5 @@
+// properties should be at 'application.properties' file
+
 // APPLICATION SETTINGS
 upload.path=./dynamic/images
 photo.path=./dynamic/photos
