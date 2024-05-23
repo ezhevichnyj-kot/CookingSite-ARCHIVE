@@ -5,12 +5,29 @@
     <title>Cook's stash</title>
     <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
     <link rel = "stylesheet" th:href="@{../styles/StyleRecept.css}">
-    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
     <meta http-equiv="Content-Type">
 </head>
 
-<body>
-    <div th:insert="fragments/header :: header"></div>
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/main">На главную</a>
+        <a class="header_item_choosen">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/login" class="header_item">Вход/Регистрация</a>
+    </div>
+</header>
+
+<body style="
+background: url(../images/backgroundLight.jpg);
+height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+
     <label><h1 align="center" style="margin:10px;"><em>Поиск рецептов</em></h1></label>
 
     <div class="upperTable" id="search_block">

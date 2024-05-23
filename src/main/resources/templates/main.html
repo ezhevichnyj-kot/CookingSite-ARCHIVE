@@ -5,22 +5,38 @@
     <title>Cook's stash</title>
     <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
     <link rel = "stylesheet" th:href="@{/styles/StyleMain.css}">
-    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
     <meta http-equiv="Content-Type">
 </head>
 
-<body>
-    <div th:insert="fragments/header :: header"></div>
-    
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item_choosen">На главную</a>
+        <a class="header_item" href="/search">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/login" class="header_item">Вход/Регистрация</a>
+    </div>
+</header>
+
+<body style="
+background: url(../images/backgroundDark.jpg);
+height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+
     <label><h1 align="center" style="margin:10px;"><em>Кулинарные рецепты</em></h1></label>
-    
+
     <div class="central_search">
         <input class="input_inside" type="text" placeholder="Введите название" id="search_line" onkeyup="SearchKeyUp(event)">
         <button class="button_inside" onclick="findRecipes()" style="margin-right: 5px; vertical-align:middle;">
             <img src="../images/5.png" alt="" style="width: 33px; z-index: 1; display: inline-block;">
         </button>
     </div>
-    
+
     <div class="recipe_table" id="id_recipe_table_copy">
         <div class="recipe_table_line" id="id_recipe_table_line_copy" style="display: none">
             <a class="recipe_place" id="id_recipe_copy">
@@ -33,49 +49,49 @@
             </a>
         </div>
     </div>
-    
+
     <script>
-        
+
         function SearchKeyUp(event){
             if(event.keyCode == 13){
                 findRecipes();
             }
         }
-        
+
         function findRecipes() {
             UnloadRecipes();
             findRecipesByName(12);
         }
-        
+
         function UnloadRecipes() {
-            
+
             table = document.getElementById("id_recipe_table_copy");
             delete_child = table.lastElementChild;
             while (delete_child.id != "id_recipe_table_line_copy") {
-                
+
                 console.log(delete_child.id);
                 table.removeChild(delete_child);
                 delete_child = table.lastElementChild;
             }
             return false;
         }
-        
+
         function findRecipesByName(count) {
-            
+
             RECIPESEND = false;
             GLOBALRECIPES = 0;
             var line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
             line_index.id = "";
             var  inline_recipe_index = 0;
             var last_id = 0;
-            
+
             var xmlHttp = new XMLHttpRequest();
-            
+
             var name = document.getElementById("search_line").value;
             xmlHttpParams = "?count=" + count + "&find_name=" + name;
             xmlHttp.open( "GET", "http://localhost:8080/search_recipes" + xmlHttpParams, false ); // false for synchronous request
             xmlHttp.send();
-            
+
             var myArr = JSON.parse(xmlHttp.response);
             if (myArr == null || myArr.length == 0) {
                 RECIPESEND = true;
@@ -84,38 +100,38 @@
             else
             {
                 console.log("myArr = ",myArr);
-                
+
                 myArr.forEach(function(entry) {
                     if (inline_recipe_index == 0) {
                         line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
                         document.getElementById("id_recipe_table_copy").appendChild(line_index);
                         line_index.id = "";
                         line_index.style = "";
-                        
+
                         temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
                         temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
-                        
+
                         child_p = temporary_recipe.querySelector('.pchild');
                         child_img = temporary_recipe.querySelector('.imgchild');
                         child_cat = temporary_recipe.querySelector('.catchild');
                         child_time = temporary_recipe.querySelector('.timechild');
-                        
+
                         if (entry.cook_time == null)
-                        child_time.innerHTML = "Без времени";
+                            child_time.innerHTML = "Без времени";
                         else
-                        child_time.innerHTML = "Время приготовления: " + entry.cook_time;
-                        
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
                         if (entry.category == null)
-                        child_cat.innerHTML = "Без категории";
+                            child_cat.innerHTML = "Без категории";
                         else
-                        child_cat.innerHTML = "Категория: " + entry.category;
-                        
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
                         child_p.innerHTML = entry.name;
                         if (entry.image_path == null)
-                        child_img.src = "../../images/ReseptLogo.jpg";
+                            child_img.src = "../../images/ReseptLogo.jpg";
                         else
-                        child_img.src = "/img/" + entry.id + ".jpg";
-                        
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
                         line_index.appendChild(temporary_recipe);
                         inline_recipe_index += 1;
                         last_id = entry.id;
@@ -124,69 +140,69 @@
                     {
                         temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
                         temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
-                        
+
                         child_p = temporary_recipe.querySelector('.pchild');
                         child_img = temporary_recipe.querySelector('.imgchild');
                         child_cat = temporary_recipe.querySelector('.catchild');
                         child_time = temporary_recipe.querySelector('.timechild');
-                        
+
                         if (entry.cook_time == null)
-                        child_time.innerHTML = "Без времени";
+                            child_time.innerHTML = "Без времени";
                         else
-                        child_time.innerHTML = "Время приготовления: " + entry.cook_time;
-                        
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
                         if (entry.category == null)
-                        child_cat.innerHTML = "Без категории";
+                            child_cat.innerHTML = "Без категории";
                         else
-                        child_cat.innerHTML = "Категория: " + entry.category;
-                        
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
                         child_p.innerHTML = entry.name;
                         if (entry.image_path == null)
-                        child_img.src = "../images/ReseptLogo.jpg";
+                            child_img.src = "../images/ReseptLogo.jpg";
                         else
-                        child_img.src = "/img/" + entry.id + ".jpg";
-                        
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
                         line_index.appendChild(temporary_recipe);
                         inline_recipe_index += 1;
                         last_id = entry.id;
-                        
+
                         if (inline_recipe_index == 3)
-                        {
-                            inline_recipe_index = 0;
-                        }
+                            {
+                                inline_recipe_index = 0;
+                            }
                     }
                     GLOBALRECIPES += 1;
                 });
             }
-            
+
             console.log("GLOBAL COUNT",GLOBALRECIPES);
             var RECIPESEND = true;
         }
-        
+
     </script>
     <script>
         var line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
         line_index.id = "";
         var  inline_recipe_index = 3;
         var last_id = 0;
-        
+
         var GLOBALRECIPES = 9;
         var RECIPESEND = false;
-        
+
         window.onload = loadRecipes(9);
-        
+
         window.onscroll = function(ev) {
             if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight && GLOBALRECIPES < 24 && RECIPESEND == false) {
                 loadRecipes(6);
             }
         };
-        
+
         function loadRecipes(count) {
             var xmlHttp = new XMLHttpRequest();
             xmlHttpParams = "?count=" + count + "&begin=" + last_id;
             xmlHttp.open( "GET", "http://localhost:8080/main/get_recipe" + xmlHttpParams, false ); // false for synchronous request
             xmlHttp.send();
-            
+
             var myArr = JSON.parse(xmlHttp.response);
             if (myArr == null || myArr.length == 0) {
                 RECIPESEND = true;
@@ -195,38 +211,38 @@
             else
             {
                 console.log("myArr = ",myArr);
-                
+
                 myArr.forEach(function(entry) {
                     if (inline_recipe_index == 3) {
                         line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
                         line_index.id = "";
                         line_index.style = "";
                         inline_recipe_index = 0;
-                        
+
                         temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
                         temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
-                        
+
                         child_p = temporary_recipe.querySelector('.pchild');
                         child_img = temporary_recipe.querySelector('.imgchild');
                         child_cat = temporary_recipe.querySelector('.catchild');
                         child_time = temporary_recipe.querySelector('.timechild');
-                        
+
                         if (entry.cook_time == null)
-                        child_time.innerHTML = "Без времени";
+                            child_time.innerHTML = "Без времени";
                         else
-                        child_time.innerHTML = "Время приготовления: " + entry.cook_time;
-                        
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
                         if (entry.category == null)
-                        child_cat.innerHTML = "Без категории";
+                            child_cat.innerHTML = "Без категории";
                         else
-                        child_cat.innerHTML = "Категория: " + entry.category;
-                        
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
                         child_p.innerHTML = entry.name;
                         if (entry.image_path == null)
-                        child_img.src = "../images/ReseptLogo.jpg";
+                            child_img.src = "../images/ReseptLogo.jpg";
                         else
-                        child_img.src = "/img/" + entry.id + ".jpg";
-                        
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
                         line_index.appendChild(temporary_recipe);
                         inline_recipe_index += 1;
                         last_id = entry.id;
@@ -235,42 +251,42 @@
                     {
                         temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
                         temporary_recipe.href = "http://localhost:8080/recipe/" + entry.id;
-                        
+
                         child_p = temporary_recipe.querySelector('.pchild');
                         child_img = temporary_recipe.querySelector('.imgchild');
                         child_cat = temporary_recipe.querySelector('.catchild');
                         child_time = temporary_recipe.querySelector('.timechild');
-                        
+
                         if (entry.cook_time == null)
-                        child_time.innerHTML = "Без времени";
+                            child_time.innerHTML = "Без времени";
                         else
-                        child_time.innerHTML = "Время приготовления: " + entry.cook_time;
-                        
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
                         if (entry.category == null)
-                        child_cat.innerHTML = "Без категории";
+                            child_cat.innerHTML = "Без категории";
                         else
-                        child_cat.innerHTML = "Категория: " + entry.category;
-                        
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
                         child_p.innerHTML = entry.name;
                         if (entry.image_path == null)
-                        child_img.src = "../images/ReseptLogo.jpg";
+                            child_img.src = "../images/ReseptLogo.jpg";
                         else
-                        child_img.src = "/img/" + entry.id + ".jpg";
-                        
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
                         line_index.appendChild(temporary_recipe);
                         inline_recipe_index += 1;
                         last_id = entry.id;
-                        
+
                         if (inline_recipe_index == 3)
-                        document.getElementById("id_recipe_table_copy").appendChild(line_index);
+                            document.getElementById("id_recipe_table_copy").appendChild(line_index);
                     }
                     GLOBALRECIPES += 1;
                 });
             }
-            
+
             console.log("GLOBAL COUNT",GLOBALRECIPES);
         }
     </script>
-    
+
 </body>
 </html>

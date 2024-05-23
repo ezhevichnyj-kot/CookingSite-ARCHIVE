@@ -6,201 +6,215 @@
     <title>Cook's stash</title>
     <link rel="icon" th:href="@{../images/prof_photo.jpg}" type="images/x-icon">
     <link rel = "stylesheet" th:href="@{../styles/StyleRecept.css}">
-    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
     <meta http-equiv="Content-Type">
 </head>
 
-<body>
-    <div th:insert="fragments/header :: header"></div>
-    <div class="containerForId" style="display: none;" th:id="${showRecipe.getId()}"></div>
-    
-    <div class="upperTable">
-        <div class="table_part">
-            <img th:if="${showRecipe.getImage_path() != null && showRecipe.getImage_path() != ''}" class="recipe_image" th:src="${'/img/' + showRecipe.getId() + '.jpg'}" style="width: 230px; height: 230px;">
-            <img th:if="${showRecipe.getImage_path() == null || showRecipe.getImage_path() == ''}" class="recipe_image" src="../images/ReceptLogo3.jpg" style="width: 230px;">
-            
-            <form class="small_part" th:action="${'/change-recipe-image/'+ showRecipe.getId()}" method="POST" enctype="multipart/form-data">
-                <label class="form_button" style="display: block; margin: 10px; margin-left: 10px; text-align: center; height: 24px;">
-                    <input style="display: none; width: 100%; height: 100%;" type="file" name="recipe_image">
-                    Выбрать
-                </label>
-                <button type="submit" class="form_button" style="height: 50px; display: block;">Поменять изображение</button>
-            </form>
-            
-        </div>
-        <div class="table_part">
-            <div class="small_part">
-                <input maxlength="30" name="inputName" th:if="${showRecipe.getName() != null && showRecipe.getName() != ''}" style="font-weight: bold; font-size: 22px;" th:placeholder="${showRecipe.getName()}">
-                <input maxlength="30" name="inputName" th:if="${showRecipe.getName() == null || showRecipe.getName() == ''}" style="font-weight: bold; font-size: 22px;" placeholder="Без названия">
-            </div>
-            <div class="small_part">
-                <p style="display: inline-block; margin-right: 3px;">Категория:</p>
-                <input maxlength="30" name="inputCategory" th:if="${showRecipe.getCategory() != null && showRecipe.getCategory() != ''}" style="display: inline-block; margin-right: 3px;" th:placeholder="${showRecipe.getCategory()}">
-                <input maxlength="30" name="inputCategory" th:if="${showRecipe.getCategory() == null || showRecipe.getCategory() == ''}" style="display: inline-block; margin-right: 3px;" placeholder="без категории">
-            </div>
-            <div class="small_part">
-                <p style="display: inline-block; margin-right: 3px;">Время приготовления:</p>
-                <input type="time" name="inputTime" th:if="${showRecipe.getCook_time() != null && showRecipe.getCook_time() != ''}" style="display: inline-block; margin-right: 3px;" th:value="${showRecipe.getCook_time()}">
-                <input type="time" name="inputTime" th:if="${showRecipe.getCook_time() == null || showRecipe.getCook_time() == ''}" style="display: inline-block; margin-right: 3px;">
-            </div>
-            
-            <p class="small_part">Ингредиенты:</p>
-            <div class="small_part" style="display: flex; max-width: 300px; flex-direction:row; flex-wrap:wrap;" id="ingredient_table">
-                <button style="display: none;" class="ingredient_show" id="ingredient_copy"></button>
-            </div>
-            <input maxlength="30" id="ingredient_tab" style="display: flex; margin-left: 10px; margin-top: 3px;" placeholder="Название ингредиента" list="ingredients">
-            <button class="small_part form_button" style="height: 50px;" onclick="add_ingredient()">Добавить ингредиент</button>
-            
-            <datalist id="ingredients">
-                <option id="option">
-                </datalist>
-            </div>
-        </div>
-        
-        <div class="upperTable">
-            <label><h2 style="color: #13452d;">Описание</h2></label>
-            <textarea maxlength="3500" name="description" th:if="${showRecipe.getDescription() != null && showRecipe.getDescription() != ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getDescription()}"></textarea>
-            <textarea maxlength="3500" name="description" th:if="${showRecipe.getDescription() == null || showRecipe.getDescription() == ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;">Описание отсутствует.</textarea>
-        </div>
-        
-        <div class="upperTable">
-            <label><h2 style="color: #13452d;">Процесс приготовления</h2></label>
-            <textarea maxlength="3500" name="cook_steps" th:if="${showRecipe.getCook_steps() != null && showRecipe.getCook_steps() != ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getCook_steps()}"></textarea>
-            <textarea maxlength="3500" name="cook_steps" th:if="${showRecipe.getCook_steps() == null || showRecipe.getCook_steps() == ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;">Нет описания процесса приготовления данного блюда. Приносим свои извинения!</textarea>
-        </div>
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/main">На главную</a>
+        <a class="header_item" href="/search">Расширенный поиск</a>
     </div>
-    
-    <div class="upperTable">
-        <button class="small_part form_button" style="display: inline-block; width: 300px;" onclick="saveRecipe()">СОХРАНИТЬ</button>
-        <p style="display: none;" id="errorMessage">Не удалось сохранить рецепт!</p>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/login" class="header_item">Вход/Регистрация</a>
     </div>
-    
-    <script>
-        INGREDIENT_COUNT = 0;
-        
-        function add_ingredient() {
-            if (document.getElementById("ingredient_tab").value != null && document.getElementById("ingredient_tab").value != "" && INGREDIENT_COUNT != 15)
-            {
-                xmlHttp = new XMLHttpRequest();
-                xmlHttpParam = "&name=" + document.getElementById("ingredient_tab").value;
-                xmlHttp.open( "GET", "http://localhost:8080/add_ingredient?id=" + containerId.id + xmlHttpParam, true); // false for synchronous request
-                xmlHttp.send();
-                
-                var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
-                new_ingredient.id = '';
-                new_ingredient.style = "";
-                new_ingredient.innerHTML = document.getElementById("ingredient_tab").value;
-                var table = document.getElementById("ingredient_table");
-                table.appendChild(new_ingredient);
-                
-                document.getElementById("ingredient_tab").value = '';
-                INGREDIENT_COUNT += 1;
-                
-                if ( document.getElementById("NOINGREDS") != null) {
-                    console.log("ТИПО УДАЛЁН");
-                    document.getElementById("NOINGREDS").remove();
-                }
-            }
-        }
-    </script>
-    <!-- NEW -->
-    <script>
-        
-        var containerId = document.querySelector('.containerForId');
-        
-        function saveRecipe() {
-            //textarea
-            var new_cook_steps = document.querySelector('[name="cook_steps"]');
-            var new_description = document.querySelector('[name="description"]');
-            
-            //input
-            var new_name = document.querySelector('[name="inputName"]');
-            var new_time = document.querySelector('[name="inputTime"]');
-            var new_category = document.querySelector('[name="inputCategory"]');
-            
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttpParams = "?id=" + containerId.id;
-            
-            if (new_name.value != null && new_name.value != '')
-            xmlHttpParams += "&recipe_name=" + new_name.value;
-            
-            if (new_time.value != null && new_time.value != '')
-            xmlHttpParams += "&cook_time=" + new_time.value;
-            
-            if (new_category.value != null && new_category.value != '')
-            xmlHttpParams += "&category=" + new_category.value;
-            
-            if (new_cook_steps.value != null && new_cook_steps.value != '')
-            xmlHttpParams += "&cook_steps=" + new_cook_steps.value;
-            
-            if (new_description.value != null && new_description.value != '')
-            xmlHttpParams += "&description=" + new_description.value;
-            
-            xmlHttp.open( "GET", "http://localhost:8080/create_recipe_update" + xmlHttpParams, false ); // false for synchronous request
+</header>
+
+<body class="" style="background: url(../images/backgroundLight.jpg); height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+<div class="containerForId" style="display: none;" th:id="${showRecipe.getId()}"></div>
+
+<div class="upperTable">
+    <div class="table_part">
+        <img th:if="${showRecipe.getImage_path() != null && showRecipe.getImage_path() != ''}" class="recipe_image" th:src="${'/img/' + showRecipe.getId() + '.jpg'}" style="width: 230px; height: 230px;">
+        <img th:if="${showRecipe.getImage_path() == null || showRecipe.getImage_path() == ''}" class="recipe_image" src="../images/ReceptLogo3.jpg" style="width: 230px;">
+
+        <form class="small_part" th:action="${'/change-recipe-image/'+ showRecipe.getId()}" method="POST" enctype="multipart/form-data">
+            <label class="form_button" style="display: block; margin: 10px; margin-left: 10px; text-align: center; height: 24px;">
+                <input style="display: none; width: 100%; height: 100%;" type="file" name="recipe_image">
+                Выбрать
+            </label>
+            <button type="submit" class="form_button" style="height: 50px; display: block;">Поменять изображение</button>
+        </form>
+
+    </div>
+    <div class="table_part">
+        <div class="small_part">
+            <input maxlength="30" name="inputName" th:if="${showRecipe.getName() != null && showRecipe.getName() != ''}" style="font-weight: bold; font-size: 22px;" th:placeholder="${showRecipe.getName()}">
+            <input maxlength="30" name="inputName" th:if="${showRecipe.getName() == null || showRecipe.getName() == ''}" style="font-weight: bold; font-size: 22px;" placeholder="Без названия">
+        </div>
+        <div class="small_part">
+            <p style="display: inline-block; margin-right: 3px;">Категория:</p>
+            <input maxlength="30" name="inputCategory" th:if="${showRecipe.getCategory() != null && showRecipe.getCategory() != ''}" style="display: inline-block; margin-right: 3px;" th:placeholder="${showRecipe.getCategory()}">
+            <input maxlength="30" name="inputCategory" th:if="${showRecipe.getCategory() == null || showRecipe.getCategory() == ''}" style="display: inline-block; margin-right: 3px;" placeholder="без категории">
+        </div>
+        <div class="small_part">
+            <p style="display: inline-block; margin-right: 3px;">Время приготовления:</p>
+            <input type="time" name="inputTime" th:if="${showRecipe.getCook_time() != null && showRecipe.getCook_time() != ''}" style="display: inline-block; margin-right: 3px;" th:value="${showRecipe.getCook_time()}">
+            <input type="time" name="inputTime" th:if="${showRecipe.getCook_time() == null || showRecipe.getCook_time() == ''}" style="display: inline-block; margin-right: 3px;">
+        </div>
+
+        <p class="small_part">Ингредиенты:</p>
+        <div class="small_part" style="display: flex; max-width: 300px; flex-direction:row; flex-wrap:wrap;" id="ingredient_table">
+            <button style="display: none;" class="ingredient_show" id="ingredient_copy"></button>
+        </div>
+        <input maxlength="30" id="ingredient_tab" style="display: flex; margin-left: 10px; margin-top: 3px;" placeholder="Название ингредиента" list="ingredients">
+        <button class="small_part form_button" style="height: 50px;" onclick="add_ingredient()">Добавить ингредиент</button>
+
+        <datalist id="ingredients">
+            <option id="option">
+        </datalist>
+    </div>
+</div>
+
+<div class="upperTable">
+    <label><h2 style="color: #13452d;">Описание</h2></label>
+    <textarea maxlength="3500" name="description" th:if="${showRecipe.getDescription() != null && showRecipe.getDescription() != ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getDescription()}"></textarea>
+    <textarea maxlength="3500" name="description" th:if="${showRecipe.getDescription() == null || showRecipe.getDescription() == ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;">Описание отсутствует.</textarea>
+</div>
+
+<div class="upperTable">
+    <label><h2 style="color: #13452d;">Процесс приготовления</h2></label>
+    <textarea maxlength="3500" name="cook_steps" th:if="${showRecipe.getCook_steps() != null && showRecipe.getCook_steps() != ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;" th:text="${showRecipe.getCook_steps()}"></textarea>
+    <textarea maxlength="3500" name="cook_steps" th:if="${showRecipe.getCook_steps() == null || showRecipe.getCook_steps() == ''}" style="margin-top: 20px; resize: none; width: 50%; height: 300px; font-size: 18px; display: inline-block; text-align: left;">Нет описания процесса приготовления данного блюда. Приносим свои извинения!</textarea>
+</div>
+</div>
+
+<div class="upperTable">
+    <button class="small_part form_button" style="display: inline-block; width: 300px;" onclick="saveRecipe()">СОХРАНИТЬ</button>
+    <p style="display: none;" id="errorMessage">Не удалось сохранить рецепт!</p>
+</div>
+
+<script>
+    INGREDIENT_COUNT = 0;
+
+    function add_ingredient() {
+        if (document.getElementById("ingredient_tab").value != null && document.getElementById("ingredient_tab").value != "" && INGREDIENT_COUNT != 15)
+        {
+            xmlHttp = new XMLHttpRequest();
+            xmlHttpParam = "&name=" + document.getElementById("ingredient_tab").value;
+            xmlHttp.open( "GET", "http://localhost:8080/add_ingredient?id=" + containerId.id + xmlHttpParam, true); // false for synchronous request
             xmlHttp.send();
-            
-            if (xmlHttp.response == "true")
-            {
-                window.location.reload();
-            }
-            else
-            {
-                document.getElementById().style.display='block';
-            }
-        }
-    </script>
-    
-    <!--RECIPE SCRIPT-->
-    <script>
-        window.onload = () => {
-            var xmlHttp = new XMLHttpRequest();
-            var containerId = document.querySelector('.containerForId');
-            xmlHttpParams = "?id="+ containerId.id;
-            xmlHttp.open( "GET", "http://localhost:8080/get_ingredients" + xmlHttpParams, false ); // false for synchronous request
-            xmlHttp.send();
-            
+
+            var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
+            new_ingredient.id = '';
+            new_ingredient.style = "";
+            new_ingredient.innerHTML = document.getElementById("ingredient_tab").value;
             var table = document.getElementById("ingredient_table");
-            var ingArr = JSON.parse(xmlHttp.response);
-            if (ingArr == null || ingArr.length == 0) {
-                console.log("ingredients array is null");
+            table.appendChild(new_ingredient);
+
+            document.getElementById("ingredient_tab").value = '';
+            INGREDIENT_COUNT += 1;
+
+            if ( document.getElementById("NOINGREDS") != null) {
+                console.log("ТИПО УДАЛЁН");
+                document.getElementById("NOINGREDS").remove();
+            }
+        }
+    }
+</script>
+<!-- NEW -->
+<script>
+
+    var containerId = document.querySelector('.containerForId');
+
+    function saveRecipe() {
+        //textarea
+        var new_cook_steps = document.querySelector('[name="cook_steps"]');
+        var new_description = document.querySelector('[name="description"]');
+
+        //input
+        var new_name = document.querySelector('[name="inputName"]');
+        var new_time = document.querySelector('[name="inputTime"]');
+        var new_category = document.querySelector('[name="inputCategory"]');
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttpParams = "?id=" + containerId.id;
+
+        if (new_name.value != null && new_name.value != '')
+            xmlHttpParams += "&recipe_name=" + new_name.value;
+
+        if (new_time.value != null && new_time.value != '')
+            xmlHttpParams += "&cook_time=" + new_time.value;
+
+        if (new_category.value != null && new_category.value != '')
+            xmlHttpParams += "&category=" + new_category.value;
+
+        if (new_cook_steps.value != null && new_cook_steps.value != '')
+            xmlHttpParams += "&cook_steps=" + new_cook_steps.value;
+
+        if (new_description.value != null && new_description.value != '')
+            xmlHttpParams += "&description=" + new_description.value;
+
+        xmlHttp.open( "GET", "http://localhost:8080/create_recipe_update" + xmlHttpParams, false ); // false for synchronous request
+        xmlHttp.send();
+
+        if (xmlHttp.response == "true")
+        {
+            window.location.reload();
+        }
+        else
+        {
+            document.getElementById().style.display='block';
+        }
+    }
+</script>
+
+<!--RECIPE SCRIPT-->
+<script>
+    window.onload = () => {
+        var xmlHttp = new XMLHttpRequest();
+        var containerId = document.querySelector('.containerForId');
+        xmlHttpParams = "?id="+ containerId.id;
+        xmlHttp.open( "GET", "http://localhost:8080/get_ingredients" + xmlHttpParams, false ); // false for synchronous request
+        xmlHttp.send();
+
+        var table = document.getElementById("ingredient_table");
+        var ingArr = JSON.parse(xmlHttp.response);
+        if (ingArr == null || ingArr.length == 0) {
+            console.log("ingredients array is null");
+            var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
+            new_ingredient.style.display = '';
+            new_ingredient.id = 'NOINGREDS';
+            new_ingredient.innerHTML = "отсутствуют";
+            table.appendChild(new_ingredient);
+        }
+        else
+        {
+            console.log("ingArr = ",ingArr);
+            ingArr.forEach(function(entry){
                 var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
                 new_ingredient.style.display = '';
-                new_ingredient.id = 'NOINGREDS';
-                new_ingredient.innerHTML = "отсутствуют";
+                new_ingredient.id = "button" + containerId;
+                new_ingredient.innerHTML = entry;
                 table.appendChild(new_ingredient);
-            }
-            else
-            {
-                console.log("ingArr = ",ingArr);
-                ingArr.forEach(function(entry){
-                    var new_ingredient = document.getElementById("ingredient_copy").cloneNode(true);
-                    new_ingredient.style.display = '';
-                    new_ingredient.id = "button" + containerId;
-                    new_ingredient.innerHTML = entry;
-                    table.appendChild(new_ingredient);
-                    INGREDIENT_COUNT += 1;
-                });
-            }
-            
-            xmlHttp.open( "GET", "http://localhost:8080/get_all_ingredients", false ); // false for synchronous request
-            xmlHttp.send();
-            
-            var allingArr = JSON.parse(xmlHttp.response);
-            if (allingArr == null || allingArr.length == 0) {
-                console.log("all ingredients array is null");
-            }
-            else
-            {
-                console.log("allingArr = ",allingArr);
-                allingArr.forEach(function(entry){
-                    var new_ingredient = document.getElementById("option").cloneNode(true);
-                    new_ingredient.value = entry.name;
-                    document.getElementById("ingredients").appendChild(new_ingredient);
-                });
-            }
+                INGREDIENT_COUNT += 1;
+            });
         }
-    </script>
-    
+
+        xmlHttp.open( "GET", "http://localhost:8080/get_all_ingredients", false ); // false for synchronous request
+        xmlHttp.send();
+
+        var allingArr = JSON.parse(xmlHttp.response);
+        if (allingArr == null || allingArr.length == 0) {
+            console.log("all ingredients array is null");
+        }
+        else
+        {
+            console.log("allingArr = ",allingArr);
+            allingArr.forEach(function(entry){
+                var new_ingredient = document.getElementById("option").cloneNode(true);
+                new_ingredient.value = entry.name;
+                document.getElementById("ingredients").appendChild(new_ingredient);
+            });
+        }
+    }
+</script>
+
 </body>
 </html>
 

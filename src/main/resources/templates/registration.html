@@ -15,6 +15,10 @@
         <a class="header_item" href="/main">На главную</a>
         <a class="header_item" href="/search">Расширенный поиск</a>
     </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/login" class="header_item">Вход/Регистрация</a>
+    </div>
 </header>
 
 <body class="" style="background: url(images/backgroundLight.jpg); height: 100%;
@@ -23,17 +27,17 @@ background-size: cover;
 background-position: center;
 background-attachment: fixed">
 
-<label><h1 align="center"><em>Авторизация</em></h1></label>
+<label><h1 align="center"><em>Регистрация</em></h1></label>
 
 <div class="upperTable">
-    <form th:action="@{/perform-login}" method="post" class="table_part" style="background: #DE9E7B; border: none; border-radius: 7px; padding: 10px;">
+    <form th:action="@{/registration}" method="post" class="table_part" style="background: #DE9E7B; border: none; border-radius: 7px; padding: 10px;">
         <input name="username" class="small_part" style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" type="text" placeholder="Логин">
         <input name="password" class="small_part" style="background: #F9F0DA; border: none; border-radius: 7px; font-size: 22px; margin: 5px; padding: 3px;" type="password" placeholder="Пароль">
-        <button type="submit" class="small_part form_button" style="width: 92%;">Войти</button>
-        <p th:if="${error}">
+        <button type="submit" class="small_part form_button" style="width: 92%;">Зарегистрироваться</button>
+        <p class="small_part" th:if="registerMessage != null" th:text="${registerMessage}"></p>
     </form>
 </div>
 
-<label><h4 class="text_reg" align="center"><em><a href="/registration" style="font-size: 20px; text-decoration: underline;">Регистрация</a></em></h4></label>
+<label><h4 class="text_reg" align="center"><em><a href="/login" style="font-size: 20px; text-decoration: underline;">Авторизация</a></em></h4></label>
 </body>
 </html>

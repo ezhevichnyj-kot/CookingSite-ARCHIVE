@@ -5,176 +5,194 @@
     <title>Cook's stash</title>
     <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
     <link rel = "stylesheet" th:href="@{/styles/StyleMain.css}">
-    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
     <meta http-equiv="Content-Type">
 </head>
 
-<body>
-    <form action="/admin/reloadIngredients" method="post">
-        <div style="text-align: center; margin-top: 30px;">
-            <div style="width: 500px; text-align: center; display: inline-block;">
-                <button type="submit" style="display: inline-block;">Перезагрузить ингредиенты</button>
-            </div>
-        </div>
-    </form>
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/main">На главную</a>
+        <a class="header_item" href="/search">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a href="/profile" class="header_item">Мой профиль</a>
+    </div>
+</header>
+<body style="
+background: url(../images/backgroundDark.jpg);
+height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
 
+<form action="/admin/reloadIngredients" method="post">
     <div style="text-align: center; margin-top: 30px;">
         <div style="width: 500px; text-align: center; display: inline-block;">
-            <button onclick="loadRecipes()" style="display: inline-block;">Загрузить рецепты для проверки</button>
-            <p style="display: none; font-size: 18px; color: #F9F0DA;" id="norecipesmessage" align="center">Нет рецептов для проверки</p>
+            <button type="submit" style="display: inline-block;">Перезагрузить ингредиенты</button>
         </div>
     </div>
+</form>
 
-    <div class="recipe_table" id="id_recipe_table_copy">
-        <div class="recipe_table_line" id="id_recipe_table_line_copy" style="display: none">
-            <a class="recipe_place" id="id_recipe_copy">
-                <div class="recept_item pchild"></div>
-                <div class="image_place">
-                    <img width="315" height="315" style="margin: 5px" class="imgchild">
-                </div>
-                <div class="recept_item catchild"></div>
-                <div class="recept_item timechild"></div>
-                <div style="display: none;" class="invisible">
-                    <button class="enable_button" onclick="controllRecipe(true, this.id)">Разрешить</button>
-                    <button class="delete_button" onclick="controllRecipe(false, this.id)">Удалить</button>
-                </div>
-            </a>
-        </div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <div style="width: 500px; text-align: center; display: inline-block;">
+        <button onclick="loadRecipes()" style="display: inline-block;">Загрузить рецепты для проверки</button>
+        <p style="display: none; font-size: 18px; color: #F9F0DA;" id="norecipesmessage" align="center">Нет рецептов для проверки</p>
     </div>
+</div>
 
-    <script>
-        function controllRecipe(booly, btn_id) {
+<div class="recipe_table" id="id_recipe_table_copy">
+    <div class="recipe_table_line" id="id_recipe_table_line_copy" style="display: none">
+        <a class="recipe_place" id="id_recipe_copy">
+            <div class="recept_item pchild"></div>
+            <div class="image_place">
+                <img width="315" height="315" style="margin: 5px" class="imgchild">
+            </div>
+            <div class="recept_item catchild"></div>
+            <div class="recept_item timechild"></div>
+            <div style="display: none;" class="invisible">
+                <button class="enable_button" onclick="controllRecipe(true, this.id)">Разрешить</button>
+                <button class="delete_button" onclick="controllRecipe(false, this.id)">Удалить</button>
+            </div>
+        </a>
+    </div>
+</div>
+
+<script>
+    function controllRecipe(booly, btn_id) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlParams = "mode=" + booly;
+        xmlParams += "&id=" + btn_id.slice(6);
+
+        xmlHttp.open( "GET", "http://localhost:8080/controll_recipe?" + xmlParams, false ); // false for synchronous request
+        xmlHttp.send();
+
+        loadRecipes();
+    }
+</script>
+
+<script>
+    function UnloadRecipes() {
+
+            table = document.getElementById("id_recipe_table_copy");
+            delete_child = table.lastElementChild;
+            while (delete_child.id != "id_recipe_table_line_copy") {
+
+                console.log(delete_child.id);
+                table.removeChild(delete_child);
+                delete_child = table.lastElementChild;
+            }
+        }
+
+    function loadRecipes() {
+            UnloadRecipes();
+            var inline_recipe_index = 3;
+            var line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
+
             var xmlHttp = new XMLHttpRequest();
-            xmlParams = "mode=" + booly;
-            xmlParams += "&id=" + btn_id.slice(6);
-
-            xmlHttp.open( "GET", "http://localhost:8080/controll_recipe?" + xmlParams, false ); // false for synchronous request
+            xmlHttp.open( "GET", "http://localhost:8080/get_unchecked_recipes?count=9", false ); // false for synchronous request
             xmlHttp.send();
 
-            loadRecipes();
-        }
-    </script>
-
-    <script>
-        function UnloadRecipes() {
-
-                table = document.getElementById("id_recipe_table_copy");
-                delete_child = table.lastElementChild;
-                while (delete_child.id != "id_recipe_table_line_copy") {
-
-                    console.log(delete_child.id);
-                    table.removeChild(delete_child);
-                    delete_child = table.lastElementChild;
-                }
+            var myArr = JSON.parse(xmlHttp.response);
+            if (myArr == null || myArr.length == 0) {
+                document.getElementById("norecipesmessage").style.display = '';
+                console.log("myArr is null");
             }
+            else
+            {
+                console.log("myArr = ",myArr);
 
-        function loadRecipes() {
-                UnloadRecipes();
-                var inline_recipe_index = 3;
-                var line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
+                myArr.forEach(function(entry) {
+                    if (inline_recipe_index == 3) {
+                        line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
+                        document.getElementById("id_recipe_table_copy").appendChild(line_index);
+                        line_index.id = "";
+                        line_index.style = "";
+                        inline_recipe_index = 0;
 
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.open( "GET", "http://localhost:8080/get_unchecked_recipes?count=9", false ); // false for synchronous request
-                xmlHttp.send();
+                        temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
+                        temporary_recipe.id = entry.id;
 
-                var myArr = JSON.parse(xmlHttp.response);
-                if (myArr == null || myArr.length == 0) {
-                    document.getElementById("norecipesmessage").style.display = '';
-                    console.log("myArr is null");
-                }
-                else
-                {
-                    console.log("myArr = ",myArr);
+                        child_p = temporary_recipe.querySelector('.pchild');
+                        child_img = temporary_recipe.querySelector('.imgchild');
+                        child_cat = temporary_recipe.querySelector('.catchild');
+                        child_time = temporary_recipe.querySelector('.timechild');
 
-                    myArr.forEach(function(entry) {
-                        if (inline_recipe_index == 3) {
-                            line_index = document.getElementById("id_recipe_table_line_copy").cloneNode(false);
-                            document.getElementById("id_recipe_table_copy").appendChild(line_index);
-                            line_index.id = "";
-                            line_index.style = "";
-                            inline_recipe_index = 0;
+                        child_img.href = "http://localhost:8080/recipe/" + entry.id;
 
-                            temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
-                            temporary_recipe.id = entry.id;
+                        div_invisible = temporary_recipe.querySelector('.invisible');
+                        div_invisible.style.display = 'inline-block';
 
-                            child_p = temporary_recipe.querySelector('.pchild');
-                            child_img = temporary_recipe.querySelector('.imgchild');
-                            child_cat = temporary_recipe.querySelector('.catchild');
-                            child_time = temporary_recipe.querySelector('.timechild');
+                        child_btn_save = temporary_recipe.querySelector('.enable_button');
+                        child_btn_save.id = "savbtn" + entry.id;
 
-                            child_img.href = "http://localhost:8080/recipe/" + entry.id;
+                        child_btn_del = temporary_recipe.querySelector('.delete_button');
+                        child_btn_del.id = "delbtn" + entry.id;
 
-                            div_invisible = temporary_recipe.querySelector('.invisible');
-                            div_invisible.style.display = 'inline-block';
-
-                            child_btn_save = temporary_recipe.querySelector('.enable_button');
-                            child_btn_save.id = "savbtn" + entry.id;
-
-                            child_btn_del = temporary_recipe.querySelector('.delete_button');
-                            child_btn_del.id = "delbtn" + entry.id;
-
-                            if (entry.cook_time == null)
-                                child_time.innerHTML = "Без времени";
-                            else
-                                child_time.innerHTML = "Время приготовления: " + entry.cook_time;
-
-                            if (entry.category == null)
-                                child_cat.innerHTML = "Без категории";
-                            else
-                                child_cat.innerHTML = "Категория: " + entry.category;
-
-                            child_p.innerHTML = entry.name;
-                            if (entry.image_path == null)
-                                child_img.src = "../images/ReseptLogo.jpg";
-                            else
-                                child_img.src = "/img/" + entry.id + ".jpg";
-
-                            line_index.appendChild(temporary_recipe);
-                            inline_recipe_index += 1;
-                        }
+                        if (entry.cook_time == null)
+                            child_time.innerHTML = "Без времени";
                         else
-                        {
-                            temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
-                            temporary_recipe.id = entry.id;
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
 
-                            child_p = temporary_recipe.querySelector('.pchild');
-                            child_img = temporary_recipe.querySelector('.imgchild');
-                            child_cat = temporary_recipe.querySelector('.catchild');
-                            child_time = temporary_recipe.querySelector('.timechild');
+                        if (entry.category == null)
+                            child_cat.innerHTML = "Без категории";
+                        else
+                            child_cat.innerHTML = "Категория: " + entry.category;
 
-                            child_img.href = "http://localhost:8080/recipe/" + entry.id;
+                        child_p.innerHTML = entry.name;
+                        if (entry.image_path == null)
+                            child_img.src = "../images/ReseptLogo.jpg";
+                        else
+                            child_img.src = "/img/" + entry.id + ".jpg";
 
-                            div_invisible = temporary_recipe.querySelector('.invisible');
-                            div_invisible.style.display = 'inline-block';
+                        line_index.appendChild(temporary_recipe);
+                        inline_recipe_index += 1;
+                    }
+                    else
+                    {
+                        temporary_recipe = document.getElementById("id_recipe_copy").cloneNode(true);
+                        temporary_recipe.id = entry.id;
 
-                            child_btn_save = temporary_recipe.querySelector('.enable_button');
-                            child_btn_save.id = "savbtn" + entry.id;
+                        child_p = temporary_recipe.querySelector('.pchild');
+                        child_img = temporary_recipe.querySelector('.imgchild');
+                        child_cat = temporary_recipe.querySelector('.catchild');
+                        child_time = temporary_recipe.querySelector('.timechild');
 
-                            child_btn_del = temporary_recipe.querySelector('.delete_button');
-                            child_btn_del.id = "delbtn" + entry.id;
+                        child_img.href = "http://localhost:8080/recipe/" + entry.id;
 
-                            if (entry.cook_time == null)
-                                child_time.innerHTML = "Без времени";
-                            else
-                                child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+                        div_invisible = temporary_recipe.querySelector('.invisible');
+                        div_invisible.style.display = 'inline-block';
 
-                            if (entry.category == null)
-                                child_cat.innerHTML = "Без категории";
-                            else
-                                child_cat.innerHTML = "Категория: " + entry.category;
+                        child_btn_save = temporary_recipe.querySelector('.enable_button');
+                        child_btn_save.id = "savbtn" + entry.id;
 
-                            child_p.innerHTML = entry.name;
-                            if (entry.image_path == null)
-                                child_img.src = "../images/ReseptLogo.jpg";
-                            else
-                                child_img.src = "/img/" + entry.id + ".jpg";
+                        child_btn_del = temporary_recipe.querySelector('.delete_button');
+                        child_btn_del.id = "delbtn" + entry.id;
 
-                            line_index.appendChild(temporary_recipe);
-                            inline_recipe_index += 1;
-                        }
-                    });
-                }
-        }
-    </script>
+                        if (entry.cook_time == null)
+                            child_time.innerHTML = "Без времени";
+                        else
+                            child_time.innerHTML = "Время приготовления: " + entry.cook_time;
+
+                        if (entry.category == null)
+                            child_cat.innerHTML = "Без категории";
+                        else
+                            child_cat.innerHTML = "Категория: " + entry.category;
+
+                        child_p.innerHTML = entry.name;
+                        if (entry.image_path == null)
+                            child_img.src = "../images/ReseptLogo.jpg";
+                        else
+                            child_img.src = "/img/" + entry.id + ".jpg";
+
+                        line_index.appendChild(temporary_recipe);
+                        inline_recipe_index += 1;
+                    }
+                });
+            }
+    }
+</script>
+
 </body>
 </html>

@@ -5,13 +5,31 @@
     <title>Cook's stash</title>
     <link rel="icon" href="../images/prof_photo.jpg" type="images/x-icon">
     <link rel = "stylesheet" th:href="@{/styles/StyleMain.css}">
-    <link rel = "stylesheet" th:href="@{/styles/styleBase.css}">
     <meta http-equiv="Content-Type">
 </head>
 
-<body>
-    <div th:insert="fragments/header :: header"></div>
-    <p th:if="${error_code != null}" th:text="${'Ошибка ' + error_code}" style="font-size: 42px; margin-top: 40%; color:#F9F0DA" align="center"></p>
-    <p th:if="${error_code == null}" style="font-size: 30px; margin-top: 50px; color:#F9F0DA" align="center">Ошибка 404</p>
+<header class="header">
+    <div class="header_section">
+        <a href="/main"><img src="../images/LogoPT.png" alt="" style="margin: 10px; width: 70px;"></a>
+        <a class="header_item" href="/main"> На главную</a>
+        <a class="header_item" href="/search">Расширенный поиск</a>
+    </div>
+    <div class="header_section">
+        <a th:if="${isAuthenticated == true}" href="/profile" class="header_item">Мой профиль</a>
+        <a th:if="${isAuthenticated == false}" href="/login" class="header_item">Вход/Регистрация</a>
+    </div>
+</header>
+
+<body style="
+background: url(../images/backgroundDark.jpg);
+height: 100%;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center;
+background-attachment: fixed">
+
+<p th:if="${error_code != null}" th:text="${'Ошибка ' + error_code}" style="font-size: 42px; margin-top: 40%; color:#F9F0DA" align="center"></p>
+<p th:if="${error_code == null}" style="font-size: 30px; margin-top: 50px; color:#F9F0DA" align="center">Ошибка 404</p>
+
 </body>
 </html>
